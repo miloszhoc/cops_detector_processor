@@ -2,11 +2,15 @@ import json
 import logging
 
 import google.generativeai as genai
-from env_var import GEMINI_API_KEY, MODEL_NAME
+from env_var import GEMINI_API_KEY, MODEL_NAME, NO_DESCRIPTION_SKIP_MSG
 
 
 def process_item_data_with_llm(item: dict):
     """Extract car information from description"""
+    if item['description'] == NO_DESCRIPTION_SKIP_MSG: # processing of descriptions with this message will be skipped
+        return {'voivodeship': '', 'city': '', 'vehicle_color': '', 'car_info': '', 'current_licence_plate_number': '',
+                'old_license_plates': [], 'road_numbers': []}
+
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel(MODEL_NAME, generation_config={"response_mime_type": "application/json"})
     logging.info(f"Extracting car information from description")
@@ -27,7 +31,7 @@ def process_item_data_with_llm(item: dict):
             }}
             - Registration number may be in description or in hashtags (usually it is in both places)
             - Ignore new line characters (\\n).
-            - If data is missing, leave blank. Return only the json structure and nothing else.
+            - If data is missing, leave blank. Return only the json dictionary structure and nothing else.
             """
     response = model.generate_content(prompt)
     logging.info(f'prompt: \n{prompt}')
@@ -39,4 +43,6 @@ def process_item_data_with_llm(item: dict):
         return
     else:
         logging.info("Successfully extracted car information")
+        if isinstance(llm_extracted, list):
+            return llm_extracted[0]
         return llm_extracted

@@ -25,7 +25,10 @@ class VehicleDetails:
     llm_extracted: str
 
     def __post_init__(self):
-        self.current_plate_number = self.current_plate_number.replace(' ', '')
+        try:
+            self.current_plate_number = self.current_plate_number.replace(' ', '')
+        except AttributeError:
+            self.current_plate_number = ''
         self.roads = json.dumps(self.roads)
         self.llm_extracted = json.dumps(self.llm_extracted, ensure_ascii=False)
 
