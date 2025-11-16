@@ -20,7 +20,7 @@ def process_item_data_with_llm(item: dict):
             From the above information presented in Polish, extract the Polish name of the province and city, 
             make and model of car, current Polish vehicle registration number consisting of numbers and letters. 
             If there are, previous registration numbers and Polish numbers of roads on which the vehicle moves. 
-            save the results in json format with the following structure:
+            Save the results in json format with the following structure:
             {{voivodeship : province name (string),
             city: city (string),
             vehicle_color: color (string),
