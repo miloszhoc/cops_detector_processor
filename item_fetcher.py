@@ -27,7 +27,7 @@ class S3ItemFetcher:
         all_objects = [obj["Key"] for obj in response["Contents"]]
         LOGGER.info(f"Found {len(all_objects)} files for date: {self.base_prefix}")
         LOGGER.info(f"List of files: {all_objects}")
-        return all_objects
+        yield from all_objects
 
     def parse_file(self, key: str):
         """

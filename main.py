@@ -11,7 +11,7 @@ def main():
     day_mark = '2025-11-12'
     s = S3ItemFetcher(BUCKET_NAME, day_mark)
     for data in s.list_files_for_date():
-        all_items = json.load(s.parse_file(data))
+        all_items = json.loads(s.parse_file(data))
         for i, item in enumerate(all_items, start=1):
             LOGGER.info("Processing item %d/%d", i, len(all_items))
 
