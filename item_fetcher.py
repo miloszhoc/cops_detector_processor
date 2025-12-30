@@ -2,7 +2,8 @@ import os
 
 import boto3
 from botocore.exceptions import ClientError
-import datetime
+
+from utils.logs import LOGGER
 
 
 class S3ItemFetcher:
@@ -23,8 +24,10 @@ class S3ItemFetcher:
 
         if "Contents" not in response:
             return []
-
-        return [obj["Key"] for obj in response["Contents"]]
+        all_objects = [obj["Key"] for obj in response["Contents"]]
+        LOGGER.info(f"Found {len(all_objects)} files for date: {self.base_prefix}")
+        LOGGER.info(f"List of files: {all_objects}")
+        return all_objects
 
     def parse_file(self, key: str):
         """
@@ -32,14 +35,15 @@ class S3ItemFetcher:
         Here we simply return the file content as text.
         """
         obj = self.s3.get_object(Bucket=self.bucket, Key=key)
+        LOGGER.info(f"Parsing {key}")
         return obj["Body"].read().decode("utf-8")
 
-    def parse_files_for_date(self, date: datetime.date):
+    def parse_files_for_date(self):
         """
         Main method: lists and parses all files for a specific date.
-        Returns mapping {filename → parsed content}.
+        Returns mapping {filename -> parsed content}.
         """
-        files = self.list_files_for_date(date)
+        files = self.list_files_for_date()
         results = {}
 
         for key in files:
