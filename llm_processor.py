@@ -1,8 +1,8 @@
 import json
-import logging
 
 import google.generativeai as genai
 from env_var import GEMINI_API_KEY, MODEL_NAME, NO_DESCRIPTION_SKIP_MSG
+from utils.logs import LOGGER
 
 
 def process_item_data_with_llm(item: dict):
@@ -13,7 +13,7 @@ def process_item_data_with_llm(item: dict):
 
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel(MODEL_NAME, generation_config={"response_mime_type": "application/json"})
-    logging.info(f"Extracting car information from description")
+    LOGGER.info(f"Extracting car information from description")
     prompt = f"""
             {item['description']}
 
@@ -34,15 +34,15 @@ def process_item_data_with_llm(item: dict):
             - If data is missing, leave blank. Return only the json dictionary structure and nothing else.
             """
     response = model.generate_content(prompt)
-    logging.info(f'prompt: \n{prompt}')
-    logging.info(f'response: {response.text}')
+    LOGGER.info(f'prompt: \n{prompt}')
+    LOGGER.info(f'response: {response.text}')
     try:
         llm_extracted = json.loads(response.text)
     except json.decoder.JSONDecodeError:
-        logging.error(f"Failed to decode JSON response: {response.text}")
+        LOGGER.error(f"Failed to decode JSON response: {response.text}")
         return
     else:
-        logging.info("Successfully extracted car information")
+        LOGGER.info("Successfully extracted car information")
         if isinstance(llm_extracted, list):
             return llm_extracted[0]
         return llm_extracted
