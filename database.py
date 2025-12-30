@@ -1,4 +1,3 @@
-import logging
 from dataclasses import dataclass
 
 import psycopg2
@@ -6,6 +5,7 @@ import psycopg2.extras
 import json
 
 from env_var import DATABASE_URL
+from utils.logs import LOGGER
 
 
 @dataclass
@@ -38,7 +38,21 @@ class VehicleDetails:
     def add_item_to_database(self):
         conn = self._get_connection()
         cur = conn.cursor()
-        logging.info(f"Adding item to database")
+        LOGGER.info(f"""Adding item to database: \n 
+        description={self.description} \n,
+        img_url={self.img_url} \n,
+        img_local_path={self.img_local_path} \n,
+        img_s3_path={self.img_s3_path} \n,
+        current_plate_number={self.current_plate_number} \n,
+        old_plate_number={self.old_plate_number} \n,
+        vehicle_color={self.vehicle_color} \n,
+        voivodeship={self.voivodeship} \n,
+        city={self.city} \n,
+        source={self.source} \n,
+        roads={self.roads} \n,
+        llm_extracted={self.llm_extracted} \n,
+        car_info={self.car_info}""")
+
         cur.execute(
             """
             INSERT INTO cars (
@@ -73,4 +87,4 @@ class VehicleDetails:
         conn.commit()
         cur.close()
         conn.close()
-        logging.info(f"Record added successfully! New record ID: {new_id}")
+        LOGGER.info(f"Record added successfully! New record ID: {new_id}")
