@@ -1,13 +1,15 @@
 import json
+import time
 
 import google.generativeai as genai
 from env_var import GEMINI_API_KEY, MODEL_NAME, NO_DESCRIPTION_SKIP_MSG
 from utils.logs import LOGGER
 
 
-def process_item_data_with_llm(item: dict):
+def process_item_data_with_llm(item: dict, wait_time: int = 4) -> dict:
     """Extract car information from description"""
-    if item['description'] == NO_DESCRIPTION_SKIP_MSG: # processing of descriptions with this message will be skipped
+    time.sleep(wait_time)
+    if item['description'] == NO_DESCRIPTION_SKIP_MSG:  # processing of descriptions with this message will be skipped
         return {'voivodeship': '', 'city': '', 'vehicle_color': '', 'car_info': '', 'current_licence_plate_number': '',
                 'old_license_plates': [], 'road_numbers': []}
 
