@@ -10,25 +10,27 @@ from utils.logs import LOGGER
 def main():
     day_mark = '2025-11-12'
     s = S3ItemFetcher(BUCKET_NAME, day_mark)
-    for data in s.list_files_for_date():
-        all_items = json.loads(s.parse_file(data))
-        for i, item in enumerate(all_items, start=1):
-            LOGGER.info("Processing item %d/%d", i, len(all_items))
+    for item in s.list_files_for_date():
+        all_items = json.loads(s.parse_file(item))
+        LOGGER.info(f"Processing {item}")
+        for i, record in enumerate(all_items, start=1):
+            LOGGER.info("Found item %d/%d", i, len(all_items))
+            LOGGER.info(f"Started processing {record}")
 
-            llm_output = process_item_data_with_llm(item)
+            llm_output = process_item_data_with_llm(record)
 
             LOGGER.info(llm_output)
 
             car_info = llm_output['car_info']
-            description = item['description']
-            img_url = item['img_url']
-            img_local_path = item['img_path']
-            img_s3_path = item['s3_path']
+            description = record['description']
+            img_url = record['img_url']
+            img_local_path = record['img_path']
+            img_s3_path = record['s3_path']
             current_plate_number = llm_output['current_licence_plate_number']
             old_plate_number = llm_output['old_license_plates']
             vehicle_color = llm_output['vehicle_color']
             voivodeship = llm_output['voivodeship']
-            source = item['source']
+            source = record['source']
             city = llm_output['city']
             roads = llm_output['road_numbers']
             llm_extracted = llm_output
