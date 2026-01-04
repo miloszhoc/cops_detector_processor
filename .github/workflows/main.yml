@@ -10,12 +10,13 @@ on:
 jobs:
   run-script:
     runs-on: ubuntu-latest
+    environment: processor-env
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
 
-      - name: Set up Python
+      - name: Set up Python version
         uses: actions/setup-python@v6
         with:
           python-version: '3.12'
