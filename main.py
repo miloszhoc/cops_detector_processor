@@ -5,10 +5,22 @@ from env_var import BUCKET_NAME
 from item_fetcher import S3ItemFetcher
 from llm_processor import process_item_data_with_llm
 from utils.logs import LOGGER
+import argparse
+
+from utils.utils import validate_date
 
 
 def main():
-    day_mark = '2025-11-12'
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--date",
+                        type=str,
+                        required=True,
+                        help="Current date in YYYY-MM-DD format")
+    args = parser.parse_args()
+    
+    day_mark = args.date
+    validate_date(day_mark)
+
     s = S3ItemFetcher(BUCKET_NAME, day_mark)
     for item in s.list_files_for_date():
         all_items = json.loads(s.parse_file(item))
