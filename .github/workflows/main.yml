@@ -1,6 +1,11 @@
 name: Run processor
 on:
   workflow_dispatch:
+    inputs:
+      custom_date:
+        description: 'Date in YYYY-MM-DD format (optional, default is today)'
+        required: false
+        default: ''
 
 jobs:
   run-script:
@@ -8,16 +13,25 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+      - name: Set date
+        id: set-date
+        run: |
+          if [ -z "${{ github.event.inputs.custom_date }}" ]; then
+            echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
+          else
+            echo "date=${{ github.event.inputs.custom_date }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run script
-        run: python script.py
+        run: python main.py --date "${{ steps.set-date.outputs.date }}"
