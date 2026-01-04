@@ -20,9 +20,9 @@ def main():
     
     day_mark = validate_date(args.date)
 
-    s = S3ItemFetcher(BUCKET_NAME, day_mark)
-    for item in s.list_files_for_date():
-        all_items = json.loads(s.parse_file(item))
+    s3 = S3ItemFetcher(BUCKET_NAME, day_mark)
+    for item in s3.list_files_for_date():
+        all_items = json.loads(s3.parse_file(item))
         LOGGER.info(f"Processing {item}")
         for i, record in enumerate(all_items, start=1):
             LOGGER.info("Found item %d/%d", i, len(all_items))
@@ -50,7 +50,8 @@ def main():
                                     old_plate_number, vehicle_color, voivodeship, source, city, roads,
                                     llm_extracted).add_item_to_database()
             LOGGER.info("Processed item %d", i)
-
+    else:
+        LOGGER.info("Processing finished")
 
 if __name__ == "__main__":
     main()
