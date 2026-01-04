@@ -18,8 +18,7 @@ def main():
                         help="Current date in YYYY-MM-DD format")
     args = parser.parse_args()
     
-    day_mark = args.date
-    validate_date(day_mark)
+    day_mark = validate_date(args.date)
 
     s = S3ItemFetcher(BUCKET_NAME, day_mark)
     for item in s.list_files_for_date():
