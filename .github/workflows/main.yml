@@ -13,9 +13,6 @@ jobs:
     environment: processor-env
 
     steps:
-      - name: Debug env
-        run: env | sort
-
       - name: Checkout repo
         uses: actions/checkout@v6
 
@@ -38,4 +35,8 @@ jobs:
           fi
 
       - name: Run script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: python main.py --date "${{ steps.set-date.outputs.date }}"
