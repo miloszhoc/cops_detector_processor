@@ -10,7 +10,6 @@ permissions:
 jobs:
   demo:
     runs-on: ubuntu-latest
-    environment: processor-env
     steps:
       - run: |
           if [ -z "${{ secrets.AWS_ROLE_ARN }}" ]; then
