@@ -7,10 +7,13 @@ on:
         required: false
         default: ''
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   run-script:
-    runs-on: self-hosted
-    environment: processor-env
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
@@ -33,6 +36,11 @@ jobs:
           else
             echo "date=${{ github.event.inputs.custom_date }}" >> $GITHUB_OUTPUT
           fi
+
+      - uses: aws-actions/configure-aws-credentials@v5.1.1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
 
       - name: Run script
         env:
