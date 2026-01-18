@@ -1,4 +1,4 @@
-name: oidc-test
+name: OIDC Test
 
 on:
   workflow_dispatch:
@@ -12,10 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     environment: processor-env
     steps:
+      - run: |
+          if [ -z "${{ secrets.AWS_ROLE_ARN }}" ]; then
+            echo "SECRET PUSTY"
+            exit 1
+          else
+            echo "SECRET JEST"
+          fi
+
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-central-1
 
       - run: aws sts get-caller-identity
-
