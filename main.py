@@ -17,7 +17,7 @@ def main():
                         required=True,
                         help="Current date in YYYY-MM-DD format")
     args = parser.parse_args()
-    
+
     day_mark = validate_date(args.date)
 
     s3 = S3ItemFetcher(BUCKET_NAME, day_mark)
@@ -52,6 +52,7 @@ def main():
             LOGGER.info("Processed item %d", i)
     else:
         LOGGER.info("Processing finished")
+
 
 if __name__ == "__main__":
     main()
