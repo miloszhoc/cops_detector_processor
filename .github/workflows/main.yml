@@ -1,5 +1,8 @@
 name: Run processor
 on:
+  schedule:
+    - cron: '0 20 * * *'
+
   workflow_dispatch:
     inputs:
       custom_date:
