@@ -1,8 +1,5 @@
 name: Run processor
 on:
-  schedule:
-    - cron: '0 11 * * *'
-
   workflow_dispatch:
     inputs:
       custom_date:
@@ -10,12 +7,18 @@ on:
         required: false
         default: ''
 
+  workflow_call:
+    inputs:
+      custom_date:
+        required: false
+        type: string
+
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  run-script:
+  run-processor:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,10 +37,10 @@ jobs:
       - name: Set date
         id: set-date
         run: |
-          if [ -z "${{ github.event.inputs.custom_date }}" ]; then
+          if [ -z "${{ inputs.custom_date }}" ]; then
             echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
           else
-            echo "date=${{ github.event.inputs.custom_date }}" >> $GITHUB_OUTPUT
+            echo "date=${{ inputs.custom_date }}" >> $GITHUB_OUTPUT
           fi
 
       - uses: aws-actions/configure-aws-credentials@v5.1.1
