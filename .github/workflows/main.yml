@@ -1,17 +1,13 @@
 name: Run processor
 on:
+  schedule:
+    - cron: '0 14 * * *'
   workflow_dispatch:
     inputs:
       custom_date:
         description: 'Date in YYYY-MM-DD format (optional, default is today)'
         required: false
         default: ''
-
-  workflow_call:
-    inputs:
-      custom_date:
-        required: false
-        type: string
 
 permissions:
   id-token: write
