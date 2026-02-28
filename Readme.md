@@ -1,4 +1,4 @@
-1. Create .env file with the following variables:
+1. Create .env file with the following variables: 
 ```
 - POSTGRES_USER=<db user>
 - POSTGRES_PASSWORD=<db pass>
