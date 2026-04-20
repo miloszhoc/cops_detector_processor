@@ -1,20 +1,41 @@
 import json
 import time
-
+from google.api_core.exceptions import ResourceExhausted
 import google.generativeai as genai
-from env_var import GEMINI_API_KEY, MODEL_NAME, NO_DESCRIPTION_SKIP_MSG
+from env_var import GEMINI_API_KEY, MODEL_NAMES, NO_DESCRIPTION_SKIP_MSG
 from utils.logs import LOGGER
 
 
-def process_item_data_with_llm(item: dict, wait_time: int = 4) -> dict:
-    """Extract car information from description"""
-    time.sleep(wait_time)
-    if item['description'] == NO_DESCRIPTION_SKIP_MSG:  # processing of descriptions with this message will be skipped
-        return {'voivodeship': '', 'city': '', 'vehicle_color': '', 'car_info': '', 'current_licence_plate_number': '',
-                'old_license_plates': [], 'road_numbers': []}
+def try_model(func, item, models: list | tuple):
+    used_model = None
+    for model in models:
+        try:
+            func(item, model)
+            LOGGER.info(f'Using {model}')
+            used_model = model
+            break
+        except ResourceExhausted:
+            LOGGER.info('Fallback to...')
+    return used_model
 
+
+def fallback_to_different_model(func):
+    def internal(item, **kwargs):
+        used_model = None
+        if kwargs.get('models'):
+            models = kwargs['models'] + MODEL_NAMES  # try models defined by user + predefined models
+            used_model = try_model(func, item, models)
+        else:
+            used_model = try_model(func, item, MODEL_NAMES)
+        return used_model
+
+    return internal
+
+
+@fallback_to_different_model
+def query_llm(item: dict, model: list = None):
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel(MODEL_NAME, generation_config={"response_mime_type": "application/json"})
+    gemini_model = genai.GenerativeModel(model, generation_config={"response_mime_type": "application/json"})
     LOGGER.info(f"Extracting car information from description")
     prompt = f"""
             {item['description']}
@@ -35,8 +56,18 @@ def process_item_data_with_llm(item: dict, wait_time: int = 4) -> dict:
             - Ignore new line characters (\\n).
             - If data is missing, leave blank. Return only the json dictionary structure and nothing else.
             """
-    response = model.generate_content(prompt)
+    response = gemini_model.generate_content(prompt)
     LOGGER.info(f'prompt: \n{prompt}')
+    return response
+
+
+def process_item_data_with_llm(item: dict, wait_time: int = 4) -> dict:
+    """Extract car information from description"""
+    time.sleep(wait_time)
+    if item['description'] == NO_DESCRIPTION_SKIP_MSG:  # processing of descriptions with this message will be skipped
+        return {'voivodeship': '', 'city': '', 'vehicle_color': '', 'car_info': '', 'current_licence_plate_number': '',
+                'old_license_plates': [], 'road_numbers': []}
+    response = query_llm(item)
     LOGGER.info(f'response: {response.text}')
     try:
         llm_extracted = json.loads(response.text)

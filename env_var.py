@@ -3,5 +3,5 @@ import os
 GEMINI_API_KEY = os.environ['GEMINI_API_KEY']
 DATABASE_URL = os.environ['DATABASE_URL']
 NO_DESCRIPTION_SKIP_MSG = 'NO_PHOTO_DESCRIPTION'
-MODEL_NAME = 'gemini-2.5-flash'
+MODEL_NAMES = ['gemini-3-flash', 'gemini-2.5-flash']
 BUCKET_NAME = os.environ['S3_BUCKET_NAME']
