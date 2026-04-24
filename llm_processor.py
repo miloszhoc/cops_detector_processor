@@ -7,27 +7,25 @@ from utils.logs import LOGGER
 
 
 def try_model(func, item, models: list | tuple):
-    used_model = None
     for model in models:
         try:
-            func(item, model)
+            output = func(item, model)
             LOGGER.info(f'Using {model}')
-            used_model = model
             break
         except ResourceExhausted:
             LOGGER.info('Fallback to...')
-    return used_model
+    return output
 
 
 def fallback_to_different_model(func):
     def internal(item, **kwargs):
-        used_model = None
+        output = None
         if kwargs.get('models'):
             models = kwargs['models'] + MODEL_NAMES  # try models defined by user + predefined models
-            used_model = try_model(func, item, models)
+            output = try_model(func, item, models)
         else:
-            used_model = try_model(func, item, MODEL_NAMES)
-        return used_model
+            output = try_model(func, item, MODEL_NAMES)
+        return output
 
     return internal
 
