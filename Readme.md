@@ -96,3 +96,4 @@ The application expects a table named `cars` with the following columns:
 - `llm_extracted` (JSONB)
 - `car_info` (Text)
 - `created_at` (Timestamp - recommended)
+
