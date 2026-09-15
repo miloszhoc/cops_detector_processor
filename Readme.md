@@ -97,3 +97,4 @@ The application expects a table named `cars` with the following columns:
 - `car_info` (Text)
 - `created_at` (Timestamp - recommended)
 
+
